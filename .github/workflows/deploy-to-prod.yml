@@ -32,30 +32,17 @@ jobs:
           gem install bundler
           bundle install
 
-      # Step 4: Debug Repository Contents
-      - name: Debug Repository Contents
-        run: |
-          echo "Listing repository contents:"
-          ls -al
-
-      # Step 5: Clean Build Directory
+      # Step 4: Clean Build Directory
       - name: Clean Build Directory
         run: |
           rm -rf _site
 
-      # Step 6: Build Jekyll Site
+      # Step 5: Build Jekyll Site
       - name: Build Jekyll Site
         run: |
           bundle exec jekyll build
 
-      - name: Debug Repository Contents
-        run: |
-          echo "Listing repository contents:"
-          ls -al
-          echo "Listing _site directory contents:"
-          ls -al _site || echo "_site directory does not exist or is empty."
-
-      # Step 7: Validate Jekyll Build
+      # Step 6: Validate Jekyll Build
       - name: Validate Jekyll Build
         run: |
           if [ ! -d "_site" ]; then
@@ -67,30 +54,40 @@ jobs:
             exit 1
           fi
 
-      # Step 8: Deploy to dev-repo GitHub Pages
+      # Step 7: Deploy to dev-repo GitHub Pages
       - name: Deploy to Staging (GitHub Pages)
         run: |
+          # Copy _site contents to a temporary directory
+          mkdir temp_site
+          cp -r _site/* temp_site/
+
+          # Switch to gh-pages branch
           git checkout --orphan gh-pages
           git reset --hard
           git clean -fdx
-          cp -r _site/* .
+
+          # Copy files from temp_site to the root of the gh-pages branch
+          cp -r temp_site/* .
+          rm -rf temp_site
+
+          # Commit and push changes
           git add .
           git commit -m "Deploy Jekyll site to staging (GitHub Pages)"
           git push --force origin gh-pages
 
-      # Step 9: Clone Production Repository
+      # Step 8: Clone Production Repository
       - name: Clone Production Repository
         run: |
           git clone https://hshah-mitre:${{ secrets.PROD_REPO_PAT }}@github.com/hshah-mitre/prod-repo.git prod-repo
           cd prod-repo
           git pull origin main
 
-      # Step 10: Copy All Generated Files to Production Repository
+      # Step 9: Copy All Generated Files to Production Repository
       - name: Copy Generated Files to Production Repository
         run: |
           rsync -av --exclude='.git' ./_site/ prod-repo/
 
-      # Step 11: Commit and Push Changes to prod-repo
+      # Step 10: Commit and Push Changes to prod-repo
       - name: Commit and Push Changes
         run: |
           cd prod-repo
