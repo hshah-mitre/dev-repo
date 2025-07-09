@@ -1,4 +1,4 @@
-name: Deploy to Production and GitHub Pages
+name: Deploy to Production
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # Trigger deployment when changes are pushed to the main branch
 
 jobs:
-  deploy-prod:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -56,57 +56,3 @@ jobs:
           git add .
           git commit -m "Deploy Jekyll site from dev-repo to prod-repo"
           git push origin main
-
-  deploy-pages:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Step 1: Checkout the dev-repo
-      - name: Checkout Development Repository
-        uses: actions/checkout@v3
-
-      # Step 2: Configure Git
-      - name: Configure Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      # Step 3: Install Ruby and Jekyll dependencies
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.0 # Specify the Ruby version compatible with Jekyll
-          bundler-cache: true
-
-      - name: Install Jekyll and dependencies
-        run: |
-          gem install bundler
-          bundle install
-
-      # Step 4: Build the Jekyll site in dev-repo
-      - name: Build Jekyll Site in Development Repository
-        run: |
-          bundle exec jekyll build
-
-      # Step 5: Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        run: |
-          # Clone the repository
-          git clone https://github.com/hshah-mitre/dev-repo.git gh-pages
-          cd gh-pages
-
-          # Create gh-pages branch if it doesn't exist
-          if ! git rev-parse --verify gh-pages; then
-            git checkout --orphan gh-pages
-          else
-            git checkout gh-pages
-          fi
-
-          # Remove old files and copy new ones
-          rm -rf *
-          cp -r ../_site/* .
-
-          # Commit and push changes
-          git add .
-          git commit -m "Deploy Jekyll site to GitHub Pages"
-          git push origin gh-pages
