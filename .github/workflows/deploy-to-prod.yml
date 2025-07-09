@@ -37,7 +37,6 @@ jobs:
         run: |
           bundle exec jekyll build
 
-      # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         run: |
           git clone https://github.com/hshah-mitre/dev-repo.git gh-pages
@@ -47,6 +46,7 @@ jobs:
           cp -r ../_site/* .
           git add .
           git commit -m "Deploy Jekyll site to GitHub Pages"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hshah-mitre/dev-repo.git
           git push origin gh-pages
 
   deploy-prod:
