@@ -48,6 +48,13 @@ jobs:
         run: |
           bundle exec jekyll build
 
+      - name: Debug Repository Contents
+        run: |
+          echo "Listing repository contents:"
+          ls -al
+          echo "Listing _site directory contents:"
+          ls -al _site || echo "_site directory does not exist or is empty."
+
       # Step 7: Validate Jekyll Build
       - name: Validate Jekyll Build
         run: |
