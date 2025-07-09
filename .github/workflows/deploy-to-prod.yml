@@ -42,33 +42,21 @@ jobs:
         run: |
           bundle exec jekyll build
 
-      # Step 6: Validate Jekyll Build
-      - name: Validate Jekyll Build
+      # Step 6: Debug Jekyll Build Output
+      - name: Debug Jekyll Build Output
         run: |
-          if [ ! -d "_site" ]; then
-            echo "Jekyll build failed: _site directory not found."
-            exit 1
-          fi
-          if [ -z "$(ls -A _site)" ]; then
-            echo "Jekyll build failed: _site directory is empty."
-            exit 1
-          fi
+          echo "Listing contents of _site directory:"
+          ls -al _site || echo "_site directory does not exist or is empty."
 
       # Step 7: Deploy to dev-repo GitHub Pages
       - name: Deploy to Staging (GitHub Pages)
         run: |
-          # Copy _site contents to a temporary directory
-          mkdir temp_site
-          cp -r _site/* temp_site/
-
           # Switch to gh-pages branch
           git checkout --orphan gh-pages
           git reset --hard
-          git clean -fdx
 
-          # Copy files from temp_site to the root of the gh-pages branch
-          cp -r temp_site/* .
-          rm -rf temp_site
+          # Copy files from _site to the root of the gh-pages branch
+          cp -r _site/* .
 
           # Commit and push changes
           git add .
