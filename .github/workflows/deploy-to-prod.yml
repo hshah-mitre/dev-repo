@@ -32,8 +32,8 @@ jobs:
           gem install bundler
           bundle install
 
-      # Step 4: Build the Jekyll site
-      - name: Build Jekyll Site
+      # Step 4: Build the Jekyll site in dev-repo
+      - name: Build Jekyll Site in Development Repository
         run: |
           bundle exec jekyll build
 
@@ -44,7 +44,7 @@ jobs:
           cd prod-repo
           git pull origin main
 
-      # Step 6: Copy built Jekyll site to prod-repo
+      # Step 6: Copy built Jekyll site from dev-repo to prod-repo
       - name: Copy Built Site to Production Repository
         run: |
           rsync -av --exclude='.git' ./_site/ prod-repo/
