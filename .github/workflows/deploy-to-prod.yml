@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Deploy Jekyll Site to Production
 
 on:
   push:
@@ -57,8 +57,8 @@ jobs:
           cd prod-repo
           git pull origin main
 
-      # Step 8: Copy Built Site to Production Repository
-      - name: Copy Built Site to Production Repository
+      # Step 8: Copy All Generated Files to Production Repository
+      - name: Copy Generated Files to Production Repository
         run: |
           rsync -av --exclude='.git' ./_site/ prod-repo/
 
