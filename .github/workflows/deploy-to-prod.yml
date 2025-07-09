@@ -92,21 +92,16 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           # Clone the repository
+          git clone --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hshah-mitre/dev-repo.git gh-pages || \
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hshah-mitre/dev-repo.git gh-pages
+
           cd gh-pages
-
-          # Create gh-pages branch if it doesn't exist
-          if ! git rev-parse --verify gh-pages; then
-            git checkout --orphan gh-pages
-          else
-            git checkout gh-pages
-          fi
-
-          # Remove old files and copy new ones
+          git checkout gh-pages || git checkout --orphan gh-pages
+          git pull origin gh-pages || true
+          
           rm -rf *
           cp -r ../_site/* .
-
-          # Commit and push changes to gh-pages branch
+          
           git add .
-          git commit -m "Deploy Jekyll site to GitHub Pages"
+          git commit -m "Deploy Jekyll site to GitHub Pages" || echo "No changes to commit"
           git push origin gh-pages
