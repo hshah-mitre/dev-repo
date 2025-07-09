@@ -1,4 +1,4 @@
-name: Deploy Jekyll Site to Production
+name: Deploy Jekyll Site to Staging and Production
 
 on:
   push:
@@ -50,19 +50,30 @@ jobs:
             exit 1
           fi
 
-      # Step 7: Clone Production Repository
+      # Step 7: Deploy to dev-repo GitHub Pages
+      - name: Deploy to Staging (GitHub Pages)
+        run: |
+          git checkout --orphan gh-pages
+          git reset --hard
+          git clean -fdx
+          cp -r _site/* .
+          git add .
+          git commit -m "Deploy Jekyll site to staging (GitHub Pages)"
+          git push --force origin gh-pages
+
+      # Step 8: Clone Production Repository
       - name: Clone Production Repository
         run: |
           git clone https://hshah-mitre:${{ secrets.PROD_REPO_PAT }}@github.com/hshah-mitre/prod-repo.git prod-repo
           cd prod-repo
           git pull origin main
 
-      # Step 8: Copy All Generated Files to Production Repository
+      # Step 9: Copy All Generated Files to Production Repository
       - name: Copy Generated Files to Production Repository
         run: |
           rsync -av --exclude='.git' ./_site/ prod-repo/
 
-      # Step 9: Commit and Push Changes to prod-repo
+      # Step 10: Commit and Push Changes to prod-repo
       - name: Commit and Push Changes
         run: |
           cd prod-repo
