@@ -49,6 +49,10 @@ jobs:
             echo "Jekyll build failed: _site directory not found."
             exit 1
           fi
+          if [ -z "$(ls -A _site)" ]; then
+            echo "Jekyll build failed: _site directory is empty."
+            exit 1
+          fi
 
       # Step 7: Deploy to dev-repo GitHub Pages
       - name: Deploy to Staging (GitHub Pages)
