@@ -92,7 +92,7 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           # Clone the repository
-          git clone https://github.com/hshah-mitre/dev-repo.git gh-pages
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/hshah-mitre/dev-repo.git gh-pages
           cd gh-pages
 
           # Create gh-pages branch if it doesn't exist
