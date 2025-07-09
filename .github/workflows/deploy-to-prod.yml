@@ -32,27 +32,40 @@ jobs:
           gem install bundler
           bundle install
 
-      # Step 4: Build the Jekyll site
+      # Step 4: Clean Build Directory
+      - name: Clean Build Directory
+        run: |
+          rm -rf _site
+
+      # Step 5: Build Jekyll Site
       - name: Build Jekyll Site
         run: |
           bundle exec jekyll build
 
-      # Step 5: Clone the prod-repo
+      # Step 6: Validate Jekyll Build
+      - name: Validate Jekyll Build
+        run: |
+          if [ ! -d "_site" ]; then
+            echo "Jekyll build failed: _site directory not found."
+            exit 1
+          fi
+
+      # Step 7: Clone Production Repository
       - name: Clone Production Repository
         run: |
           git clone https://hshah-mitre:${{ secrets.PROD_REPO_PAT }}@github.com/hshah-mitre/prod-repo.git prod-repo
           cd prod-repo
           git pull origin main
 
-      # Step 6: Copy built Jekyll site to prod-repo
+      # Step 8: Copy Built Site to Production Repository
       - name: Copy Built Site to Production Repository
         run: |
           rsync -av --exclude='.git' ./_site/ prod-repo/
 
-      # Step 7: Commit and Push Changes to prod-repo
+      # Step 9: Commit and Push Changes to prod-repo
       - name: Commit and Push Changes
         run: |
           cd prod-repo
           git add .
-          git commit -m "Deploy Jekyll site from dev-repo to prod-repo"
+          git commit -m "Deploy Jekyll site from dev-repo to prod-repo" || echo "No changes to commit."
           git push origin main
